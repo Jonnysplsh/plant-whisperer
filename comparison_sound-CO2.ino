@@ -1,7 +1,6 @@
 /* Definitions */
 
-// SOUND SENSOR definitions
-
+// SOUND SENSOR Definitions
 const int OUT_PIN = 8;
 const int SAMPLE_TIME = 10;
 unsigned long millisCurrent;
@@ -9,24 +8,100 @@ unsigned long millisLast = 0;
 unsigned long millisElapsed = 0;
 
 // CO2 SENSOR Definitions
-
 const int pwmpin = 7;
 const int range = 5000;
 
-/*________________________________________________*/
+// LCD Panel Definitions
+#include <Wire.h> 
+#include <LiquidCrystal.h>
 
-// The setup()-function
+//These 5 arrays paint the bars that go across the screen.  
+byte zero[] = {
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000
+};
+byte one[] = {
+  B10000,
+  B10000,
+  B10000,
+  B10000,
+  B10000,
+  B10000,
+  B10000,
+  B10000
+};
+
+byte two[] = {
+  B11000,
+  B11000,
+  B11000,
+  B11000,
+  B11000,
+  B11000,
+  B11000,
+  B11000
+};
+
+byte three[] = {
+  B11100,
+  B11100,
+  B11100,
+  B11100,
+  B11100,
+  B11100,
+  B11100,
+  B11100
+};
+
+byte four[] = {
+  B11110,
+  B11110,
+  B11110,
+  B11110,
+  B11110,
+  B11110,
+  B11110,
+  B11110
+};
+
+byte five[] = {
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+  B11111
+};
+
 
 void setup() {
 
     pinMode(pwmpin, INPUT);
     Serial.begin(9600)
+
+// initialize the LCD and allocate the 5 arrays to a number.
+    lcd.begin(16, 2);
+    lcd.createChar(0, zero);
+    lcd.createChar(1, one);
+    lcd.createChar(2, two);
+    lcd.createChar(3, three);
+    lcd.createChar(4, four);
+    lcd.createChar(5, five);
 }
 
-// The loop()-function
+
+
 void loop() {
 
-  // __SOUND SENSOR Seriel plotter definitions__
+  // __SOUND SENSOR
   millisCurrent = millis();
   millisElapsed = millisCurrent - millisLast;
 
@@ -40,70 +115,75 @@ void loop() {
     millisLast = millisCurrent;
   }
 
-    /*________________________________________________*/
 
-  // __CO2 SENSOR defintions__  
+  // __CO2 SENSOR
   int ppm_pwm = readCO2PWM();
-
-  // Ausgabe der Werte über die serielle USB-Verbindung
   
   Serial.print("PPM PWM: ");
   Serial.println(ppm_pwm);
 
-  // Messungen alle 3 Sekundn
-  
-  delay(2000);
-  
-  /*________________________________________________*/
+  delay(3000);
 
-  if (sampleBufferValue > 50 && ppm_pwm > 800){
-      
+
+  // __ LCD SCREEN
+  for(int i=0; i <= 100; i++)
+  {
+    lcd.setCursor(0,0);
+    lcd.print(i);
+    lcd.print("   ");
+    updateProgressBar(i, 100, 1); 
+    delay(200);
   }
+  delay(1000);
+  for(int i=100; i >= 0; i--)
+  {
+    lcd.setCursor(0,0);
+    lcd.print(i);
+    lcd.print("   ");
+    updateProgressBar(i, 100, 1);   
+    delay(50);
+  }
+  delay(1000);
 }
+
+
+// __ MAIN FUNCTION
+if (sampleBufferValue > 50 && ppm_pwm > 800){}
 
 int readCO2PWM() {
 
-  // Es werden die für die Umrechnung der Zeitdauer auf
-  // die PPM-Werte benötigten Variablen definiert.
-  // Da es sich bei th um große Werte handeln kann - die verwendete
-  // Arduino-Funktion gibt Mikrosekunden zurück - wird diese Variable
-  // als vorzeichenlose (unsigned) große Ganzzahl (long) definiert.
-  
   unsigned long th;
   int ppm_pwm = 0;
   float pulsepercent;
 
-  // Alles, was in der do ... while-Schleife steht, wird
-  // solange ausgeführt, bis der Ausdruck nach while, hier
-  // th == 0 als zutreffend (wahr) erkannt wird.
-  // Da die Arduino-Funktion pulseIn() 0 zurückgibt, solange
-  // sie am Messen ist, dient die Schleife dazu, auf den
-  // Messwert zu warten.
-  
+ 
   do {
 
-    // pulseIn gibt die Dauer des am Pin (pwmpin) anliegenden
-    // Signals in Mikrosekunden an. Die maximale Signallänge ist
-    // 1004ms. Der Timeoutwert der pulseIn-Funktion muss also
-    // mindestens 1004000µs betragen. Für ungünstige Fälle wird
-    // sicherheitshalber ein größerer Wert von 2500000µs gewählt.
-    // Die Ausgabe der pulseIn()-Funktion wird durch 1000 geteilt
-    // und ergibt so für th die Signallänge in Millisekunden (ms).
-    
     th = pulseIn(pwmpin, HIGH, 2500000) / 1000;
 
-    // Pulslänge in Prozent (%)
-
     float pulsepercent = th / 1004.0;
-
-    // PPM-Werte bei gegebenem Range
     
     ppm_pwm = range * pulsepercent;
     
   } while (th == 0);
-  
-  // Der gemessene Wert wird an die loop()-Funktion zurückgegeben,
-  // wo er dann ausgegeben wird.
+
   
   return ppm_pwm; 
 }
+
+//LCD Screen
+void updateProgressBar(unsigned long count, unsigned long totalCount, int lineToPrintOn)
+ {
+    double factor = totalCount/80.0;          //See note above!
+    int percent = (count+1)/factor;
+    int number = percent/5;
+    int remainder = percent%5;
+    if(number > 0)
+    {
+       lcd.setCursor(number-1,lineToPrintOn);
+       lcd.write(5);
+    }
+   
+       lcd.setCursor(number,lineToPrintOn);
+       lcd.write(remainder);   
+ }
