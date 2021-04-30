@@ -11,7 +11,7 @@
    
 */
 
-const int OUT_PIN = 8;
+const int OUT_PIN = 2;
 const int SAMPLE_TIME = 10;
 unsigned long millisCurrent;
 unsigned long millisLast = 0;

@@ -2,5 +2,5 @@
     "port": "/dev/tty.usbmodem142101",
     "board": "arduino:avr:uno",
     "programmer": "arduino:avrisp",
-    "sketch": "Sound-serial_plotter.ino"
+    "sketch": "comparison_sound-CO2.ino"
 }

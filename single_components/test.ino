@@ -1,6 +1,16 @@
-/* Definitions */
+/*
+   Bas on Tech
+   This course is part of the courses on https://arduino-tutorials.net
+   (c) Copyright 2020 - Bas van Dijk / Bas on Tech
+   This code and course is copyrighted. It is not allowed to use these courses commercially
+   without explicit written approval
+   YouTube:    https://www.youtube.com/c/BasOnTech
+   Facebook:   https://www.facebook.com/BasOnTechChannel
+   Instagram:  https://www.instagram.com/BasOnTech
+   Twitter:    https://twitter.com/BasOnTech
+   
+*/
 
-// SOUND SENSOR Definitions
 const int OUT_PIN = 2;
 const int SAMPLE_TIME = 10;
 unsigned long millisCurrent;
@@ -9,9 +19,11 @@ unsigned long millisElapsed = 0;
 
 int sampleBufferValue = 0;
 
+
 // CO2 SENSOR Definitions
 const int pwmpin = 4;
 const int range = 7000;
+
 
 // LCD Panel Definitions
 #include <Wire.h> 
@@ -85,14 +97,11 @@ byte five[] = {
   B11111
 };
 
-/*__________________________________________________________________*/
-
 void setup() {
-
+  Serial.begin(9600);
     pinMode(pwmpin, INPUT);
-    Serial.begin(9600);
 
-// initialize the LCD and allocate the 5 arrays to a number.
+  // initialize the LCD and allocate the 5 arrays to a number.
     lcd.begin(16, 2);
     lcd.createChar(0, zero);
     lcd.createChar(1, one);
@@ -102,9 +111,6 @@ void setup() {
     lcd.createChar(5, five);
 }
 
-/*__________________________________________________________________*/
-
-//CO2_Function
 int readCO2PWM() {
 
   unsigned long th;
@@ -128,11 +134,10 @@ int readCO2PWM() {
 
 void loop() {
 
-  // __SOUND SENSOR
   millisCurrent = millis();
   millisElapsed = millisCurrent - millisLast;
 
-    if (digitalRead(OUT_PIN) == HIGH) {
+  if (digitalRead(OUT_PIN) == HIGH) {
     sampleBufferValue++;
   }
 
@@ -142,8 +147,6 @@ void loop() {
     millisLast = millisCurrent;
   }
 
-
-  // __CO2 SENSOR
   int ppm_pwm = readCO2PWM();
   
   Serial.print("PPM PWM: ");
@@ -151,37 +154,8 @@ void loop() {
 
   delay(1000);
 
-
-  // __ MAIN FUNCTION
-  if ((sampleBufferValue < 150) && (ppm_pwm < 6800)){
-
-    //PauseAction == true
-    lcd.setCursor(0,0);
-    lcd.print ("Hello");
-  }
-  else {  for(int i=0; i <= 100; i++)
-  {
-    lcd.setCursor(0,0);
-    lcd.print(i);
-    lcd.print("   ");
-    updateProgressBar(i, 100, 1); 
-    delay(200);
-  }
-  delay(1000);
-  for(int i=100; i >= 0; i--)
-  {
-    lcd.setCursor(0,0);
-    lcd.print(i);
-    lcd.print("   ");
-    updateProgressBar(i, 100, 1);   
-    delay(50);
-  }
-  delay(1000);}
 };
 
-/*__________________________________________________________________*/
-
-//LCD Screen
 void updateProgressBar(unsigned long count, unsigned long totalCount, int lineToPrintOn)
  {
     double factor = totalCount/80.0;          //See note above!

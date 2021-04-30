@@ -81,6 +81,8 @@ byte five[] = {
   B11111
 };
 
+
+
 void setup() {
 
 
@@ -94,6 +96,8 @@ void setup() {
   lcd.createChar(5, five);
 
 }
+
+/*__________________________________________________________________*/
 
 //This simple loop code prints a number from 0 to 100 on the top line and displays the progress bar on the bottom line.
 // The loop counts up, pauses for 1 second, then counts down again.

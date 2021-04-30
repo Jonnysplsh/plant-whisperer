@@ -5,7 +5,7 @@
 
 // Der Sensor hängt an Pin 7
 
-const int pwmpin = 7;
+const int pwmpin = 4;
 
 // Der eingestellte Messbereich (0-5000ppm)
 
